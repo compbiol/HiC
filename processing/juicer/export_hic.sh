@@ -38,8 +38,7 @@ then
         * (5) normalization: type of normalization, to be applied to the exported data. Available options: [NONE/VC/VC_SQRT/KR].
         * (6) resolution: a unit of resolution. Available options: [BP|FRAG]
         * (7) bin_size: a size of the matrix entry in the resolution unit specified above.
-        * (8) output
-        * (9) juicebox_tools_path: a path to juicebox_tools.jar file
+        * (8) juicebox_tools_path: a path to juicebox_tools.jar file
     "
     exit 0
 fi
@@ -52,6 +51,14 @@ then
      exit 1
 fi
 
+JUICEBOX_TOOLS_PATH=$8
+if [[ ! $8 ]];
+then
+    JUICEBOX_TOOLS_PATH="juicebox_tools.jar"
+fi
+
+OUTPUT_FILE_NAME="$1_$2_$3_$7_$5.txt"
+echo "Result file: $OUTPUT_FILE_NAME"
 # java -jar juicebox_tools.jar dump observed file.hic chr1 chr2 BP 10000 output.txt
-java -jar $9 dump $4 $5 ${amazon_sources[$1]} $2 $3 $6 $7 $8
+java -jar ${JUICEBOX_TOOLS_PATH} dump $4 $5 ${amazon_sources[$1]} $2 $3 $6 $7 ${OUTPUT_FILE_NAME}
 
