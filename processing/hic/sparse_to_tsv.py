@@ -15,6 +15,7 @@ def read_hic_export(file_name, step=None, ignore_empty_start=True, symmetrical=T
     chr1_min_value = 100000000000
     chr2_min_value = 100000000000
     reader = csv.reader(file_name, delimiter='\t', quotechar='|')
+    logger.info("Reading sparse hic export matrix")
     for row in reader:
         row_id, column_id, value = int(row[0]), int(row[1]), float(row[2])
         data.append((row_id, column_id, value))
@@ -26,7 +27,9 @@ def read_hic_export(file_name, step=None, ignore_empty_start=True, symmetrical=T
             chr2_min_value = column_id
         if row_id < chr1_min_value:
             chr1_min_value = row_id
+    logger.info("Creating pandas DataFrame")
     if step is None:
+        logger.info("Inferring matrix resolution")
         rows = sorted(set([entry[0] for entry in data]))
         rows_min = min(a2 - a1 for a1, a2 in zip(rows[:-1], rows[1:]))
         columns = sorted(set([entry[1] for entry in data]))
@@ -52,11 +55,15 @@ def read_hic_export(file_name, step=None, ignore_empty_start=True, symmetrical=T
                                                                                       step=step))
     df = pd.DataFrame(0, index=np.arange(chr1_min_value, chr1_max_value, step),
                       columns=np.arange(chr2_min_value, chr2_max_value, step))
-    for row_id, column_id, value in data:
+    total_records_length = len(data)
+    ticks = [int(total_records_length * (i / 10.0)) for i in range(0, 11, 1)]
+    for cnt, (row_id, column_id, value) in enumerate(data):
+        if cnt in ticks:
+            logger.info("Assigned {cnt}% of values".format(cnt=ticks.index(cnt) * 10))
         value = 0.0 if np.isnan(value) else value
         df.set_value(row_id, column_id, value)
         df.set_value(column_id, row_id, value)
-
+    logger.info("Assigned 100% of values")
     return df
 
 
@@ -65,10 +72,11 @@ if __name__ == "__main__":
     parser.add_argument("sparse_contact_matrix", type=argparse.FileType("rt"), default=sys.stdin)
     parser.add_argument("-o", "--output", default=sys.stdout, type=argparse.FileType("wt"))
     parser.add_argument("--ignore-empty-start", action="store_true", default=False)
-    parser.add_argument("--step", default=None)
-    parser.add_argument("--diff-chromosomes", action="store_true", dest="same_chromosomes", default=False)
+    parser.add_argument("--step", type=int, default=None)
+    parser.add_argument("--diff-chromosomes", action="store_false", dest="same_chromosomes", default=True)
     parser.add_argument("--output-separator", default="\t")
     parser.add_argument("--output-upper-triangular", action="store_true", dest="upper_tria", default=False)
+    parser.add_argument("--compression", choices=["gzip", "bz2", "xz", None], default="gzip")
     args = parser.parse_args()
     logging.basicConfig(level=logging.DEBUG,
                         format='%(asctime)s %(name)-12s %(levelname)-8s %(message)s',
@@ -88,4 +96,6 @@ if __name__ == "__main__":
     if args.upper_tria:
         logger.info("Substituting all the data from lower triangle of the matrix with zeros")
         df = df.where(np.triu(np.ones(df.shape)).astype(np.bool)).fillna(0)
-    df.to_csv(path_or_buf=args.output, sep=args.output_separator)
+    logger.info("Writing matrix down tyo {output}".format(output=args.output.name))
+    df.to_csv(path_or_buf=args.output, sep=args.output_separator, compression=args.compression)
+    logger.info("All done. Full matrix is written to {output}".format(output=args.output.name))
