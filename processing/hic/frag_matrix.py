@@ -177,8 +177,8 @@ if __name__ == "__main__":
     print("# fragment min. size :: {f_lengths}".format(f_lengths=args.frag_lengths), file=args.output)
     print("# chromosome 1 :: {f1}".format(f1=chr1), file=args.output)
     print("# chromosome 2 :: {f2}".format(f2=chr2), file=args.output)
-    print("# chromosome 1 fragment cnt :: {f1_cnt}".format(f1_cnt=len(fragments1)))
-    print("# chromosome 2 fragment cnt :: {f2_cnt}".format(f2_cnt=len(fragments2)))
+    print("# chromosome {chr1} fragment cnt :: {f1_cnt}".format(f1_cnt=len(fragments1), chr1=chr1), file=args.output)
+    print("# chromosome {chr2} fragment cnt :: {f2_cnt}".format(f2_cnt=len(fragments2), chr2=chr2), file=args.output)
     for key1 in sorted(contacts.keys()):
         for key2 in sorted(contacts[key1].keys()):
             print(key1, key2, contacts[key1][key2], sep="\t", file=args.output)
