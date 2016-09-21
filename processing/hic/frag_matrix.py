@@ -127,7 +127,7 @@ if __name__ == "__main__":
     parser.add_argument("--measure", choices=["outer", "inner", "fractions"], default="inner")
     parser.add_argument("--existing", type=str, default=None)
     parser.add_argument("--frag-lengths", type=int, default=-1)
-    parser.add_argument("--logging", choices=[logging.DEBUG, logging.INFO, logging.WARNING, logging.ERROR, logging.CRITICAL], default=logging.INFO)
+    parser.add_argument("--logging", type=int, choices=[logging.DEBUG, logging.INFO, logging.WARNING, logging.ERROR, logging.CRITICAL], default=logging.INFO)
     parser.add_argument("-o", "--output", default=sys.stdout, type=argparse.FileType("wt"))
     args = parser.parse_args()
     logging.basicConfig(level=logging.DEBUG,
