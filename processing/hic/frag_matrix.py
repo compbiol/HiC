@@ -174,5 +174,5 @@ if __name__ == "__main__":
     logger.info("Computed all pairwise contacts. Outputting results.")
     for key1 in sorted(contacts.keys()):
         for key2 in sorted(contacts[key1].keys()):
-            print(key1, key2, contacts[key1][key2], sep="\t")
+            print(key1, key2, contacts[key1][key2], sep="\t", file=args.output)
     logger.info("All done. It only took us: {time_cnt}".format(time_cnt=str(datetime.datetime.now() - start_time)))
