@@ -170,6 +170,7 @@ if __name__ == "__main__":
             observed.add((f1, f2))
             contacts[f1][f2] = fragments_contact
     logger.info("Computed all pairwise contacts. Outputting results.")
+    print("# python :: {python_version}".format(python_version=".".join(map(str, sys.version_info))))
     print("# hic source :: {hic} ".format(hic=os.path.basename(args.hic)), file=args.output)
     print("# fragments source :: {fragments}".format(fragments=os.path.basename(args.fragments)), file=args.output)
     print("# measure :: {measure}".format(measure=args.measure), file=args.output)
