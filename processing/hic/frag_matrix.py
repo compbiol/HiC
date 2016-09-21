@@ -70,10 +70,10 @@ def count_contacts(hic_data, f1, f2, measure, step):
         return before, after
 
     result = 0
-    f1sb = math.floor(f1.start / step) * step
-    f1sa = math.ceil(f1.start / step) * step
-    f1eb = math.floor(f1.end / step) * step
-    f1ea = math.ceil(f1.end / step) * step
+    f1sb = int(math.floor(f1.start / step) * step)
+    f1sa = int(math.ceil(f1.start / step) * step)
+    f1eb = int(math.floor(f1.end / step) * step)
+    f1ea = int(math.ceil(f1.end / step) * step)
 
     if f1eb <= f1sa:
         logger.warning("Fragment {fragment} is short ({f_length} is less than 2 bins of size {size}).".format(fragment=f1.name, size=step,
@@ -81,10 +81,10 @@ def count_contacts(hic_data, f1, f2, measure, step):
         logger.debug("Fragment {f}: start={start}, end={end}, fsb={fsb}, fsa={fsa}, feb={feb}, fea={fea}"
                      "".format(f=f1.name, start=f1.start, end=f1.end, fsb=f1sb, fsa=f1sa, feb=f1eb, fea=f1ea))
 
-    f2sb = math.floor(f2.start / step) * step
-    f2sa = math.ceil(f2.start / step) * step
-    f2eb = math.floor(f2.end / step) * step
-    f2ea = math.ceil(f2.end / step) * step
+    f2sb = int(math.floor(f2.start / step) * step)
+    f2sa = int(math.ceil(f2.start / step) * step)
+    f2eb = int(math.floor(f2.end / step) * step)
+    f2ea = int(math.ceil(f2.end / step) * step)
 
     if f2eb <= f2sa:
         logger.warning("Fragment {fragment} is short ({f_length} is less than 2 bins of size {size}).".format(fragment=f2.name, size=step,
@@ -92,8 +92,8 @@ def count_contacts(hic_data, f1, f2, measure, step):
         logger.debug("Fragment {f}: start={start}, end={end}, fsb={fsb}, fsa={fsa}, feb={feb}, fea={fea}"
                      "".format(f=f2.name, start=f2.start, end=f2.end, fsb=f2sb, fsa=f2sa, feb=f2eb, fea=f2ea))
 
-    f1_inner_multipliers = [1] * int(f1eb - f1sa)  # in case of short fragment multiplication will happen with negative number and en empty list will be produced
-    f2_inner_multipliers = [1] * int(f2eb - f2sa)  # same
+    f1_inner_multipliers = [1] * (f1eb - f1sa)  # in case of short fragment multiplication will happen with negative number and en empty list will be produced
+    f2_inner_multipliers = [1] * (f2eb - f2sa)  # same
 
     f1b, f1a = get_before_after_indexes(f=f1, fsa=f1sa, feb=f1eb, fully_inside=f1sb == f1eb and f1sa == f1ea, measure=measure)
     f2b, f2a = get_before_after_indexes(f=f1, fsa=f1sa, feb=f1eb, fully_inside=f2sb == f2eb and f2sa == f2ea, measure=measure)
