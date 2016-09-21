@@ -92,8 +92,8 @@ def count_contacts(hic_data, f1, f2, measure, step):
         logger.debug("Fragment {f}: start={start}, end={end}, fsb={fsb}, fsa={fsa}, feb={feb}, fea={fea}"
                      "".format(f=f2.name, start=f2.start, end=f2.end, fsb=f2sb, fsa=f2sa, feb=f2eb, fea=f2ea))
 
-    f1_inner_multipliers = [1] * (f1eb - f1sa)  # in case of short fragment multiplication will happen with negative number and en empty list will be produced
-    f2_inner_multipliers = [1] * (f2eb - f2sa)  # same
+    f1_inner_multipliers = [1] * int(f1eb - f1sa)  # in case of short fragment multiplication will happen with negative number and en empty list will be produced
+    f2_inner_multipliers = [1] * int(f2eb - f2sa)  # same
 
     f1b, f1a = get_before_after_indexes(f=f1, fsa=f1sa, feb=f1eb, fully_inside=f1sb == f1eb and f1sa == f1ea, measure=measure)
     f2b, f2a = get_before_after_indexes(f=f1, fsa=f1sa, feb=f1eb, fully_inside=f2sb == f2eb and f2sa == f2ea, measure=measure)
