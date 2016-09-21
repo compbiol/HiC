@@ -27,14 +27,12 @@ def load_hic_data(hic_filename):
     with open(hic_filename, "rt") as source:
         reader = csv.reader(source, delimiter='\t', quotechar='|')
         for cnt, row in enumerate(reader):
-            try:
-                row_id, column_id, value = int(row[0]), int(row[1]), float(row[2])
-                row, column = (row_id, column_id) if row_id < column_id else (column_id, row_id)
-                result[row][column] = value
-            except ValueError:
-                print(cnt, row)
-                exit(1)
-
+            if row[0].strip().startswith("#"):
+                logger.debug("Skipping row {row}".format(row="\t".join(row)))
+                continue
+            row_id, column_id, value = int(row[0]), int(row[1]), float(row[2])
+            row, column = (row_id, column_id) if row_id < column_id else (column_id, row_id)
+            result[row][column] = value
     return result
 
 
@@ -156,7 +154,7 @@ if __name__ == "__main__":
         fragments1 = [f for f in fragments if f.chromosome == chr1]
         fragments2 = [f for f in fragments if f.chromosome == chr2]
     logger.info("Will be computing pairwise contact between {f1_cnt} and {f2_cnt} fragments".format(f1_cnt=len(fragments1), f2_cnt=len(fragments2)))
-    logger.info("Loading HiC data")
+    logger.info("Loading HiC data from {hic_filename}".format(hic_filename=os.path.basename(args.hic)))
     data = load_hic_data(hic_filename=args.hic)
     contacts = defaultdict(dict)
     observed = set()
@@ -172,6 +170,15 @@ if __name__ == "__main__":
             observed.add((f1, f2))
             contacts[f1][f2] = fragments_contact
     logger.info("Computed all pairwise contacts. Outputting results.")
+    print("# hic source :: {hic} ".format(hic=os.path.basename(args.hic)), file=args.output)
+    print("# fragments source :: {fragments}".format(fragments=os.path.basename(args.fragments)), file=args.output)
+    print("# measure :: {measure}".format(measure=args.measure), file=args.output)
+    print("# bin size :: {step}".format(step=step), file=args.output)
+    print("# fragment min. size :: {f_lengths}".format(f_lengths=args.frag_lengths), file=args.output)
+    print("# chromosome 1 :: {f1}".format(f1=chr1), file=args.output)
+    print("# chromosome 2 :: {f2}".format(f2=chr2), file=args.output)
+    print("# chromosome 1 fragment cnt :: {f1_cnt}".format(f1_cnt=len(fragments1)))
+    print("# chromosome 2 fragment cnt :: {f2_cnt}".format(f2_cnt=len(fragments2)))
     for key1 in sorted(contacts.keys()):
         for key2 in sorted(contacts[key1].keys()):
             print(key1, key2, contacts[key1][key2], sep="\t", file=args.output)
