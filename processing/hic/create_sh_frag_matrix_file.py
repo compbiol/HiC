@@ -37,7 +37,7 @@ if __name__ == "__main__":
     file_template = "\n".join([
         "!/bin/sh",
         "#SBATCH -p short",
-        "#SBATCH -J {basename}",
+        "#SBATCH -J {base_name}",
         "#SBATCH -t 2:00:00",
         "#SBATCH -e {base_name}.err",
         "#SBATCH -o {base_name}.out",
