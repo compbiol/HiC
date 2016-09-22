@@ -40,7 +40,7 @@ CELL_LINE_SOURCES = {
     "rao14_kbm7": "https://hicfiles.s3.amazonaws.com/hiseq/kbm7/in-situ/combined.hic",
     "rao14_huvec": "https://hicfiles.s3.amazonaws.com/hiseq/huvec/in-situ/combined.hic",
     "rao14_hela": "https://hicfiles.s3.amazonaws.com/hiseq/hela/in-situ/combined.hic",
-    "rao14_chx12-lx": "https://hicfiles.s3.amazonaws.com/hiseq/ch12-lx-b-lymphoblasts/in-situ/combined.hic",
+    "rao14_chx12": "https://hicfiles.s3.amazonaws.com/hiseq/ch12-lx-b-lymphoblasts/in-situ/combined.hic",
     "rudan15_dog1": "http://hicfiles.s3.amazonaws.com/external/rudan/canis-lupus-rep1.hic",
     "rudan15_dog2": "http://hicfiles.s3.amazonaws.com/external/rudan/canis-lupus-rep1.hic",
     "rudan15_mouse1": "http://hicfiles.s3.amazonaws.com/external/rudan/mouse-rep1.hic",
