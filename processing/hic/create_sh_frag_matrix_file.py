@@ -55,7 +55,7 @@ if __name__ == "__main__":
             continue
         if correction.endswith(".txt"):
             correction = correction[:-4]
-        sh_file_name = "{prefix}{chr1}_{chr2}.sh".format(chr1=chr1, chr2=chr2, prefix=args.output_file_prefix)
+        sh_file_name = "{prefix}{chr1}_{chr2}.sh".format(chr1=chr1, chr2=chr2, prefix=args.output_sh_file_prefix)
         contacts_file_name = "all_{frag_lengths}_{chr1}_{chr2}_{bin_size}_KR.txt"
         with open(os.path.join(args.output_dir, sh_file_name), "wt") as dest:
             print(file_template.format(base_name=hic_file[:-4],
