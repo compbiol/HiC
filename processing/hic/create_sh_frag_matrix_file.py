@@ -54,10 +54,10 @@ if __name__ == "__main__":
         if chr1 != chr2 and args.chromosomes == "intra":
             continue
         if correction.endswith(".txt"):
-            correction = correction[:4]
+            correction = correction[:-4]
         sh_file_name = "{prefix}{chr1}_{chr2}.sh".format(chr1=chr1, chr2=chr2, prefix=args.output_file_prefix)
         with open(os.path.join(args.output_dir, sh_file_name), "wt") as dest:
-            print(file_template.format(base_name=hic_file[:4],
+            print(file_template.format(base_name=hic_file[:-4],
                                        frag_matrix_path=os.path.abspath(args.frag_matrix_path),
                                        fragments_path=os.path.abspath(args.fragments),
                                        hic_path=os.path.join(args.hic_dir, hic_file),
