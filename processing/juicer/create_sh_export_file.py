@@ -83,6 +83,8 @@ if __name__ == "__main__":
         output_path = "{cell_line}_{chr1}_{chr2}_{bin_size}_{correction}.txt".format(cell_line=args.cell_line.replace("_", "-"),
                                                                                      chr1=c1, chr2=c2, bin_size=args.bin_size,
                                                                                      correction=args.norm)
+        print("echo \"working with cell-line: {cell_line}; chromosome 1: {chr1}; chromosomes 2: {chr2}; resolution {bin_size}\""
+              "".format(cell_line=args.cell_line, chr1=chr2, chr2=chr2, bin_size=args.bin_size), file=args.output)
         print("java -jar {juicebox_tools_path} dump {data} {correction} {path} {chr1} {chr2} BP {bin_size} {output_path}"
               "".format(juicebox_tools_path=args.juicebox_tools_path,
                         data=args.data, correction=args.norm, path=CELL_LINE_SOURCES[args.cell_line],
