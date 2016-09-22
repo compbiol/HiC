@@ -35,7 +35,7 @@ if __name__ == "__main__":
         logger.debug("Output directory {path} does not exist. Creating one".format(path=args.output_dir))
         os.makedirs(args.output_dir)
     file_template = "\n".join([
-        "!/bin/sh",
+        "#!/bin/sh",
         "#SBATCH -p short",
         "#SBATCH -J {base_name}",
         "#SBATCH -t 2:00:00",
