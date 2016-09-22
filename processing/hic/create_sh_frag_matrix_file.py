@@ -8,7 +8,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--frag-matrix-path", type=str, default=os.path.join("group", "cbi", "maxal", "hicproject", "software", "HiC", "processing", "hic", "frag_matrix.py"))
     parser.add_argument("--chromosomes", choices=["inter", "intra", "all"], default="all")
-    parser.add_argument("--output-file-prefix", default="")
+    parser.add_argument("--output-sh-file-prefix", default="")
     parser.add_argument("--fragments", type=str, required=True)
     parser.add_argument("--hic-dir", type=str, required=True)
     parser.add_argument("--frag-lengths", type=str, default="10000")
@@ -56,6 +56,7 @@ if __name__ == "__main__":
         if correction.endswith(".txt"):
             correction = correction[:-4]
         sh_file_name = "{prefix}{chr1}_{chr2}.sh".format(chr1=chr1, chr2=chr2, prefix=args.output_file_prefix)
+        contacts_file_name = "all_{frag_lengths}_{chr1}_{chr2}_{bin_size}_KR.txt"
         with open(os.path.join(args.output_dir, sh_file_name), "wt") as dest:
             print(file_template.format(base_name=hic_file[:-4],
                                        frag_matrix_path=os.path.abspath(args.frag_matrix_path),
@@ -63,4 +64,4 @@ if __name__ == "__main__":
                                        hic_path=os.path.join(args.hic_dir, hic_file),
                                        frag_lengths=args.frag_lengths,
                                        measure=args.measure,
-                                       output_file_rel_path=sh_file_name), file=dest)
+                                       output_file_rel_path=contacts_file_name), file=dest)
