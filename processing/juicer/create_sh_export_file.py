@@ -70,7 +70,7 @@ if __name__ == "__main__":
                 c1, c2 = (chr1, chr2) if chr1 < chr2 else (chr2, chr1)
                 if (c1, c2) in observed:
                     continue
-                if c1 == c2 and "inter":
+                if c1 == c2 and args.chromosomes == "inter":
                     continue
                 chromosomes.append((c1, c2))
                 observed.add((c1, c2))
