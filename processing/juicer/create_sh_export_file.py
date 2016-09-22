@@ -7,7 +7,7 @@ import logging
 import sys
 
 HUMAN_CHROMOSOMES = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "X"]
-MOUSE_CHROMOSOMES = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "X"]
+MOUSE_CHROMOSOMES = ["chr1", "chr2", "chr3", "chr4", "chr5", "chr6", "chr7", "chr8", "chr9", "chr10", "chr11", "chr12", "chr13", "chr14", "chr15", "chr16", "chr17", "chr18", "chr19", "chrX"]
 DOG_CHROMOSOMES = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23", "24", "25", "26", "27", "28", "29", "30", "31", "32", "33", "34", "35", "36", "37", "38", "X"]
 RABBIT_CHROMOSOMES = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "X"]
 MACAQUE_CHROMOSOMES = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "X"]
@@ -78,8 +78,10 @@ if __name__ == "__main__":
         chromosomes = [(c, c) for c in CELL_LINES_CHROMOSOMES[args.cell_line]]
     print("#!/bin/sh", file=args.output)
     for chr1, chr2 in chromosomes:
+        c1 = chr1[3:] if chr1.startswith("chr") else chr1
+        c2 = chr2[3:] if chr2.startswith("chr") else chr2
         output_path = "{cell_line}_{chr1}_{chr2}_{bin_size}_{correction}.txt".format(cell_line=args.cell_line.replace("_", "-"),
-                                                                                     chr1=chr1, chr2=chr2, bin_size=args.bin_size,
+                                                                                     chr1=c1, chr2=c2, bin_size=args.bin_size,
                                                                                      correction=args.norm)
         print("java -jar {juicebox_tools_path} dump {data} {correction} {path} {chr1} {chr2} BP {bin_size} {output_path}"
               "".format(juicebox_tools_path=args.juicebox_tools_path,
