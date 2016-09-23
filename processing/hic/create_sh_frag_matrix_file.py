@@ -54,6 +54,7 @@ if __name__ == "__main__":
         print("#!/bin/sh", file=batch_runner_dest)
         for hic_file in hic_export_files:
             cell_line, chr1, chr2, resolution, correction = hic_file.split("_")
+            logger.debug("Working with {file_name}".format(file_name=hic_file))
             if chr1 == chr2 and args.chromosomes == "inter":
                 continue
             if chr1 != chr2 and args.chromosomes == "intra":
