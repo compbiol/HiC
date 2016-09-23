@@ -64,10 +64,9 @@ if __name__ == "__main__":
             sh_file_name = "{prefix}{chr1}_{chr2}.sh".format(chr1=chr1, chr2=chr2, prefix=args.output_sh_file_prefix)
             print("echo \"submitting file {sh_file_name}\"".format(sh_file_name=sh_file_name), file=batch_runner_dest)
             print("sbatch {sh_file_name}".format(sh_file_name=sh_file_name), file=batch_runner_dest)
-            contacts_file_name = "all_{frag_lengths}_{chr1}_{chr2}_{bin_size}_{correction}.txt" \
-                                 "".format(frag_lengths=args.frag_lengths, chr1=chr1,
-                                           chr2=chr2, bin_size=resolution,
-                                           correction=correction)
+            contacts_file_name = "all_{frag_lengths}_{chr1}_{chr2}_{bin_size}_{correction}.txt".format(frag_lengths=args.frag_lengths,
+                                                                                                       chr1=chr1, chr2=chr2, bin_size=resolution,
+                                                                                                       correction=correction)
             with open(os.path.join(args.output_dir, sh_file_name), "wt") as dest:
                 print(file_template.format(base_name=hic_file[:-4],
                                            frag_matrix_path=os.path.abspath(args.frag_matrix_path),
@@ -76,5 +75,3 @@ if __name__ == "__main__":
                                            frag_lengths=args.frag_lengths,
                                            measure=args.measure,
                                            output_file_rel_path=contacts_file_name), file=dest)
-
-
