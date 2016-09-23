@@ -53,7 +53,6 @@ if __name__ == "__main__":
     with open(os.path.join(args.output_dir, batch_runner_path), "wt") as batch_runner_dest:
         print("#!/bin/sh", file=batch_runner_dest)
         for hic_file in hic_export_files:
-            logger.debug("Creating batch sh file for {hic_file_name}".format(hic_file_name=hic_file))
             cell_line, chr1, chr2, resolution, correction = hic_file.split("_")
             if chr1 == chr2 and args.chromosomes == "inter":
                 continue
@@ -61,6 +60,7 @@ if __name__ == "__main__":
                 continue
             if correction.endswith(".txt"):
                 correction = correction[:-4]
+            logger.debug("Creating batch sh file for {hic_file_name}".format(hic_file_name=hic_file))
             sh_file_name = "{prefix}{chr1}_{chr2}.sh".format(chr1=chr1, chr2=chr2, prefix=args.output_sh_file_prefix)
             print("echo \"submitting file {sh_file_name}\"".format(sh_file_name=sh_file_name), file=batch_runner_dest)
             print("sbatch {sh_file_name}".format(sh_file_name=sh_file_name), file=batch_runner_dest)
