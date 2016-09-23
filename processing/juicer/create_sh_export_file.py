@@ -59,6 +59,7 @@ if __name__ == "__main__":
     parser.add_argument("--norm", type=str, choices=["NONE", "VC", "VC_SQRT", "KR"], default="KR")
     parser.add_argument("--bin-size", type=str, default="5000")
     parser.add_argument("--juicebox-tools-path", type=str, required=True)
+    parser.add_argument("--job-name", default="", type=str)
     parser.add_argument("-o", "--output", default=sys.stdout, type=argparse.FileType("wt"))
     logger = logging.getLogger("creating_sh_export_file")
     args = parser.parse_args()
@@ -76,7 +77,16 @@ if __name__ == "__main__":
                 observed.add((c1, c2))
     else:
         chromosomes = [(c, c) for c in CELL_LINES_CHROMOSOMES[args.cell_line]]
+    job_name = args.job_name
+    if len(args.job_name) == 0:
+        job_name = "_".join([args.cell_line.replace("_", "-"), args.chromosomes, args.data, args.norm, args.bin_size])
     print("#!/bin/sh", file=args.output)
+    print("#SBATCH -p short", file=args.output)
+    print("#SBATCH -t 6:00:00")
+    print("#SBATCH -J {job_name}".format(job_name=job_name), file=args.output)
+    print("#SBATCH -o {job_name}.out".format(job_name=job_name), file=args.output)
+    print("#SBATCH -e {job_name}.err".format(job_name=job_name), file=args.output)
+    print("module load jdk/1.8.0", file=args.output)
     for chr1, chr2 in chromosomes:
         c1 = chr1[3:] if chr1.startswith("chr") else chr1
         c2 = chr2[3:] if chr2.startswith("chr") else chr2
