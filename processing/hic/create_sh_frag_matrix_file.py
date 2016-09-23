@@ -13,6 +13,7 @@ if __name__ == "__main__":
     parser.add_argument("--hic-dir", type=str, required=True)
     parser.add_argument("--frag-lengths", type=str, default="10000")
     parser.add_argument("--measure", choices=["inner", "outer", "fractions"], default="inner")
+    parser.add_argument("--batch-runner-path", default="", type=str)
     parser.add_argument("--logging", type=int, choices=[logging.DEBUG, logging.INFO, logging.WARNING, logging.ERROR, logging.CRITICAL], default=logging.INFO)
     parser.add_argument("-o", "--output-dir", required=True)
     args = parser.parse_args()
@@ -46,23 +47,34 @@ if __name__ == "__main__":
     ])
     hic_export_files = [f for f in os.listdir(args.hic_dir) if f.endswith(".txt") and len(f.split("_")) > 4]
     logger.info("Found {hic_cnt} hic files".format(hic_cnt=len(hic_export_files)))
-    for hic_file in hic_export_files:
-        logger.debug("Creating batch sh file for {hic_file_name}".format(hic_file_name=hic_file))
-        cell_line, chr1, chr2, resolution, correction = hic_file.split("_")
-        if chr1 == chr2 and args.chromosomes == "inter":
-            continue
-        if chr1 != chr2 and args.chromosomes == "intra":
-            continue
-        if correction.endswith(".txt"):
-            correction = correction[:-4]
-        sh_file_name = "{prefix}{chr1}_{chr2}.sh".format(chr1=chr1, chr2=chr2, prefix=args.output_sh_file_prefix)
-        contacts_file_name = "all_{frag_lengths}_{chr1}_{chr2}_{bin_size}_{correction}.txt".format(
-            frag_lengths=args.frag_lengths, chr1=chr1, chr2=chr2, bin_size=resolution, correction=correction)
-        with open(os.path.join(args.output_dir, sh_file_name), "wt") as dest:
-            print(file_template.format(base_name=hic_file[:-4],
-                                       frag_matrix_path=os.path.abspath(args.frag_matrix_path),
-                                       fragments_path=os.path.abspath(args.fragments),
-                                       hic_path=os.path.join(args.hic_dir, hic_file),
-                                       frag_lengths=args.frag_lengths,
-                                       measure=args.measure,
-                                       output_file_rel_path=contacts_file_name), file=dest)
+    batch_runner_path = args.batch_runner_path
+    if len(args.batch_runner_path) == 0:
+        batch_runner_path = "_".join(["run-all", args.frag_lengths, args.chromosomes, args.measure])
+    with open(batch_runner_path, "wt") as batch_runner_dest:
+        print("#!/bin/sh", file=batch_runner_dest)
+        for hic_file in hic_export_files:
+            logger.debug("Creating batch sh file for {hic_file_name}".format(hic_file_name=hic_file))
+            cell_line, chr1, chr2, resolution, correction = hic_file.split("_")
+            if chr1 == chr2 and args.chromosomes == "inter":
+                continue
+            if chr1 != chr2 and args.chromosomes == "intra":
+                continue
+            if correction.endswith(".txt"):
+                correction = correction[:-4]
+            sh_file_name = "{prefix}{chr1}_{chr2}.sh".format(chr1=chr1, chr2=chr2, prefix=args.output_sh_file_prefix)
+            print("echo \"submitting file {sh_file_name}\"".format(sh_file_name=sh_file_name), file=batch_runner_dest)
+            print("sbatch {sh_file_name}".format(sh_file_name=sh_file_name), file=batch_runner_dest)
+            contacts_file_name = "all_{frag_lengths}_{chr1}_{chr2}_{bin_size}_{correction}.txt" \
+                                 "".format(frag_lengths=args.frag_lengths, chr1=chr1,
+                                           chr2=chr2, bin_size=resolution,
+                                           correction=correction)
+            with open(os.path.join(args.output_dir, sh_file_name), "wt") as dest:
+                print(file_template.format(base_name=hic_file[:-4],
+                                           frag_matrix_path=os.path.abspath(args.frag_matrix_path),
+                                           fragments_path=os.path.abspath(args.fragments),
+                                           hic_path=os.path.join(args.hic_dir, hic_file),
+                                           frag_lengths=args.frag_lengths,
+                                           measure=args.measure,
+                                           output_file_rel_path=contacts_file_name), file=dest)
+
+
