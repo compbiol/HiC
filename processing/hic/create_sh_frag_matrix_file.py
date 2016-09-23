@@ -49,8 +49,8 @@ if __name__ == "__main__":
     logger.info("Found {hic_cnt} hic files".format(hic_cnt=len(hic_export_files)))
     batch_runner_path = args.batch_runner_path
     if len(args.batch_runner_path) == 0:
-        batch_runner_path = "_".join(["run-all", args.frag_lengths, args.chromosomes, args.measure])
-    with open(batch_runner_path, "wt") as batch_runner_dest:
+        batch_runner_path = "_".join(["run-all", args.frag_lengths, args.chromosomes, args.measure]) + ".sh"
+    with open(os.path.join(args.output_dir, batch_runner_path), "wt") as batch_runner_dest:
         print("#!/bin/sh", file=batch_runner_dest)
         for hic_file in hic_export_files:
             logger.debug("Creating batch sh file for {hic_file_name}".format(hic_file_name=hic_file))
