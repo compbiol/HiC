@@ -14,6 +14,7 @@ if __name__ == "__main__":
     parser.add_argument("--frag-lengths", type=str, default="10000")
     parser.add_argument("--measure", choices=["inner", "outer", "fractions"], default="inner")
     parser.add_argument("--batch-runner-path", default="", type=str)
+    parser.add_argument("--time", deault="3:00:00", type=str)
     parser.add_argument("--logging", type=int, choices=[logging.DEBUG, logging.INFO, logging.WARNING, logging.ERROR, logging.CRITICAL], default=logging.INFO)
     parser.add_argument("-o", "--output-dir", required=True)
     args = parser.parse_args()
@@ -39,7 +40,7 @@ if __name__ == "__main__":
         "#!/bin/sh",
         "#SBATCH -p short",
         "#SBATCH -J {base_name}",
-        "#SBATCH -t 2:00:00",
+        "#SBATCH -t {time}",
         "#SBATCH -e {base_name}.err",
         "#SBATCH -o {base_name}.out",
         "module load python/2.7.6",
@@ -75,4 +76,5 @@ if __name__ == "__main__":
                                            hic_path=os.path.join(args.hic_dir, hic_file),
                                            frag_lengths=args.frag_lengths,
                                            measure=args.measure,
+                                           time=args.time,
                                            output_file_rel_path=contacts_file_name), file=dest)
