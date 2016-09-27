@@ -45,9 +45,9 @@ def get_fragments(fragments_filename):
     return result
 
 
-def count_contacts(hic_data, f1, f2, measure, step):
+def count_contacts(hic_data, fragment1, fragment2, measure, step):
     def get_contact(data, i, j, im, jm, observed):
-        index1, index2 = (i, j) if i < j else (j, i)
+        index1, index2 = i, j
         if (index1, index2) in observed:
             return 0
         contact = data[index1].get(index2, 0) * im * jm
@@ -67,33 +67,33 @@ def count_contacts(hic_data, f1, f2, measure, step):
         return before, after
 
     result = 0
-    f1sb = int(math.floor(f1.start / step) * step)
-    f1sa = int(math.ceil(f1.start / step) * step)
-    f1eb = int(math.floor(f1.end / step) * step)
-    f1ea = int(math.ceil(f1.end / step) * step)
+    f1sb = int(math.floor(fragment1.start / step) * step)
+    f1sa = int(math.ceil(fragment1.start / step) * step)
+    f1eb = int(math.floor(fragment1.end / step) * step)
+    f1ea = int(math.ceil(fragment1.end / step) * step)
 
     if f1eb <= f1sa:
-        logger.warning("Fragment {fragment} is short ({f_length} is less than 2 bins of size {size}).".format(fragment=f1.name, size=step,
-                                                                                                              f_length=f1.end - f1.start))
+        logger.warning("Fragment {fragment} is short ({f_length} is less than 2 bins of size {size}).".format(fragment=fragment1.name, size=step,
+                                                                                                              f_length=fragment1.end - fragment1.start))
         logger.debug("Fragment {f}: start={start}, end={end}, fsb={fsb}, fsa={fsa}, feb={feb}, fea={fea}"
-                     "".format(f=f1.name, start=f1.start, end=f1.end, fsb=f1sb, fsa=f1sa, feb=f1eb, fea=f1ea))
+                     "".format(f=fragment1.name, start=fragment1.start, end=fragment1.end, fsb=f1sb, fsa=f1sa, feb=f1eb, fea=f1ea))
 
-    f2sb = int(math.floor(f2.start / step) * step)
-    f2sa = int(math.ceil(f2.start / step) * step)
-    f2eb = int(math.floor(f2.end / step) * step)
-    f2ea = int(math.ceil(f2.end / step) * step)
+    f2sb = int(math.floor(fragment2.start / step) * step)
+    f2sa = int(math.ceil(fragment2.start / step) * step)
+    f2eb = int(math.floor(fragment2.end / step) * step)
+    f2ea = int(math.ceil(fragment2.end / step) * step)
 
     if f2eb <= f2sa:
-        logger.warning("Fragment {fragment} is short ({f_length} is less than 2 bins of size {size}).".format(fragment=f2.name, size=step,
-                                                                                                              f_length=f2.end - f2.start))
+        logger.warning("Fragment {fragment} is short ({f_length} is less than 2 bins of size {size}).".format(fragment=fragment2.name, size=step,
+                                                                                                              f_length=fragment2.end - fragment2.start))
         logger.debug("Fragment {f}: start={start}, end={end}, fsb={fsb}, fsa={fsa}, feb={feb}, fea={fea}"
-                     "".format(f=f2.name, start=f2.start, end=f2.end, fsb=f2sb, fsa=f2sa, feb=f2eb, fea=f2ea))
+                     "".format(f=fragment2.name, start=fragment2.start, end=fragment2.end, fsb=f2sb, fsa=f2sa, feb=f2eb, fea=f2ea))
 
     f1_inner_multipliers = [1] * (f1eb - f1sa)  # in case of short fragment multiplication will happen with negative number and en empty list will be produced
     f2_inner_multipliers = [1] * (f2eb - f2sa)  # same
 
-    f1b, f1a = get_before_after_indexes(f=f1, fsa=f1sa, feb=f1eb, fully_inside=f1sb == f1eb and f1sa == f1ea, measure=measure)
-    f2b, f2a = get_before_after_indexes(f=f1, fsa=f1sa, feb=f1eb, fully_inside=f2sb == f2eb and f2sa == f2ea, measure=measure)
+    f1b, f1a = get_before_after_indexes(f=fragment1, fsa=f1sa, feb=f1eb, fully_inside=f1sb == f1eb and f1sa == f1ea, measure=measure)
+    f2b, f2a = get_before_after_indexes(f=fragment1, fsa=f1sa, feb=f1eb, fully_inside=f2sb == f2eb and f2sa == f2ea, measure=measure)
 
     f1_multipliers = f1b + f1_inner_multipliers + f1a
     f2_multipliers = f2b + f2_inner_multipliers + f2a
@@ -164,10 +164,10 @@ if __name__ == "__main__":
             if (f1, f2) in observed:
                 continue
             logger.debug("Computing contacts between fragments {f1} and {f2}".format(f1=fragment1.name, f2=fragment2.name))
-            fragments_contact = count_contacts(hic_data=data, f1=fragment1, f2=fragment2, measure=args.measure, step=step)
+            fragments_contact = count_contacts(hic_data=data, fragment1=fragment1, fragment2=fragment2, measure=args.measure, step=step)
             logger.debug("Done. {f1} and {f2} have {c_cnt} HiC contacts".format(f1=fragment1.name, f2=fragment2.name, c_cnt=fragments_contact))
             observed.add((f1, f2))
-            contacts[f1][f2] = fragments_contact
+            contacts[fragment1.name][fragment2.name] = fragments_contact
     logger.info("Computed all pairwise contacts. Outputting results.")
     print("# python :: {python_version}".format(python_version=".".join(map(str, sys.version_info))), file=args.output)
     print("# hic source :: {hic} ".format(hic=os.path.abspath(args.hic)), file=args.output)
