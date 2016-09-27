@@ -31,8 +31,7 @@ def load_hic_data(hic_filename):
                 logger.debug("Skipping row {row}".format(row="\t".join(row)))
                 continue
             row_id, column_id, value = int(row[0]), int(row[1]), float(row[2])
-            row, column = (row_id, column_id) if row_id < column_id else (column_id, row_id)
-            result[row][column] = value
+            result[row_id][column_id] = value
     return result
 
 
