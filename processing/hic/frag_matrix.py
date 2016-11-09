@@ -45,7 +45,6 @@ def get_fragments(fragments_filename):
     return result
 
 
-def count_contacts(hic_data, fragment1, fragment2, measure, step):
 def count_contacts(hic_data, f1, f2, measure, step):
     """
 
@@ -182,7 +181,8 @@ if __name__ == "__main__":
                 continue
             logger.debug("Computing contacts between fragments {f1} and {f2}".format(f1=fragment1.name, f2=fragment2.name))
             fragments_contact_value, fragments_contact_matrix = count_contacts(hic_data=data, f1=fragment1, f2=fragment2, measure=args.measure, step=step)
-            logger.debug("Done. {f1} and {f2} have {c_cnt} HiC contacts".format(f1=fragment1.name, f2=fragment2.name, c_cnt=fragments_contact))
+            logger.debug("Done. {f1} and {f2} have {c_cnt} HiC contacts".format(f1=fragment1.name, f2=fragment2.name, c_cnt=fragments_contact_value))
+            logger.debug("Done. {f1} and {f2} have {c_cnt} HiC contacts matrix".format(f1=fragment1.name, f2=fragment2.name, c_cnt=str(fragments_contact_matrix)))
             observed.add((f1, f2))
             contacts_values[f1][f2] = fragments_contact_value
             contacts_matrices[f1][f2] = fragments_contact_matrix
