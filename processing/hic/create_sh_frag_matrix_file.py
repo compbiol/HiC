@@ -17,6 +17,7 @@ if __name__ == "__main__":
     parser.add_argument("--time", default="3:00:00", type=str)
     parser.add_argument("--logging", type=int, choices=[logging.DEBUG, logging.INFO, logging.WARNING, logging.ERROR, logging.CRITICAL], default=logging.INFO)
     parser.add_argument("-o", "--output-dir", required=True)
+    parser.add_argument("--contact", default="matrix", choices=["matrix", "value"])
     args = parser.parse_args()
     logging.basicConfig(level=logging.DEBUG,
                         format='%(asctime)s %(name)-12s %(levelname)-8s %(message)s',
@@ -44,7 +45,7 @@ if __name__ == "__main__":
         "#SBATCH -e {base_name}.err",
         "#SBATCH -o {base_name}.out",
         "module load python/2.7.6",
-        "python {frag_matrix_path} --fragments {fragments_path} --hic {hic_path} --frag-lengths {frag_lengths} --measure {measure} --output {output_file_rel_path}"
+        "python {frag_matrix_path} --fragments {fragments_path} --hic {hic_path} --frag-lengths {frag_lengths} --contact {contact} --measure {measure} --output {output_file_rel_path}"
     ])
     hic_export_files = [f for f in os.listdir(args.hic_dir) if f.endswith(".txt") and len(f.split("_")) > 4]
     logger.info("Found {hic_cnt} hic files".format(hic_cnt=len(hic_export_files)))
@@ -77,4 +78,5 @@ if __name__ == "__main__":
                                            frag_lengths=args.frag_lengths,
                                            measure=args.measure,
                                            time=args.time,
+                                           contact=args.contact,
                                            output_file_rel_path=contacts_file_name), file=dest)

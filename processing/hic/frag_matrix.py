@@ -46,6 +46,15 @@ def get_fragments(fragments_filename):
 
 
 def count_contacts(hic_data, f1, f2, measure, step):
+    """
+
+    :param hic_data: dict of dict like data storage
+    :param f1: fragment 1 (instance of Fragment)
+    :param f2: fragment 2 (instance of Fragment)
+    :param measure: a choice of a measure (inner/outer/fraction)
+    :param step: a discreet step, that the hic contact are counted with
+    :return:
+    """
     def get_contact(data, i, j, im, jm, observed):
         index1, index2 = (i, j) if i < j else (j, i)
         if (index1, index2) in observed:
@@ -102,10 +111,15 @@ def count_contacts(hic_data, f1, f2, measure, step):
     f2_indexes = range(f2sb, f2ea, step)
 
     counted = set()
+    list_result = []
     for f1_index, f1_multiplier in zip(f1_indexes, f1_multipliers):
+        current = []
         for f2_index, f2_multiplier in zip(f2_indexes, f2_multipliers):
-            result += get_contact(data=hic_data, i=f1_index, im=f1_multiplier, j=f2_index, jm=f2_multiplier, observed=counted)
-    return result
+            value = get_contact(data=hic_data, i=f1_index, im=f1_multiplier, j=f2_index, jm=f2_multiplier, observed=counted)
+            current.append(value)
+            result += value
+        list_result.append(current)
+    return result, list_result
 
 
 def get_chromosomes_from_hic_filename(hic):
@@ -122,6 +136,7 @@ if __name__ == "__main__":
     parser.add_argument("--hic", type=str, required=True)
     parser.add_argument("--fragments", type=str, required=True)
     parser.add_argument("--measure", choices=["outer", "inner", "fractions"], default="inner")
+    parser.add_argument("--contact", choices=["value", "matrix"], default="matrix")
     parser.add_argument("--existing", type=str, default=None)
     parser.add_argument("--frag-lengths", type=int, default=-1)
     parser.add_argument("--logging", type=int, choices=[logging.DEBUG, logging.INFO, logging.WARNING, logging.ERROR, logging.CRITICAL], default=logging.INFO)
@@ -155,7 +170,8 @@ if __name__ == "__main__":
     logger.info("Will be computing pairwise contact between {f1_cnt} and {f2_cnt} fragments".format(f1_cnt=len(fragments1), f2_cnt=len(fragments2)))
     logger.info("Loading HiC data from {hic_filename}".format(hic_filename=os.path.basename(args.hic)))
     data = load_hic_data(hic_filename=args.hic)
-    contacts = defaultdict(dict)
+    contacts_values = defaultdict(dict)
+    contacts_matrices = defaultdict(dict)
     observed = set()
     logger.info("Computing contacts")
     for fragment1 in fragments1:
@@ -164,10 +180,11 @@ if __name__ == "__main__":
             if (f1, f2) in observed:
                 continue
             logger.debug("Computing contacts between fragments {f1} and {f2}".format(f1=fragment1.name, f2=fragment2.name))
-            fragments_contact = count_contacts(hic_data=data, f1=fragment1, f2=fragment2, measure=args.measure, step=step)
+            fragments_contact_value, fragments_contact_matrix = count_contacts(hic_data=data, f1=fragment1, f2=fragment2, measure=args.measure, step=step)
             logger.debug("Done. {f1} and {f2} have {c_cnt} HiC contacts".format(f1=fragment1.name, f2=fragment2.name, c_cnt=fragments_contact))
             observed.add((f1, f2))
-            contacts[f1][f2] = fragments_contact
+            contacts_values[f1][f2] = fragments_contact_value
+            contacts_matrices[f1][f2] = fragments_contact_matrix
     logger.info("Computed all pairwise contacts. Outputting results.")
     print("# python :: {python_version}".format(python_version=".".join(map(str, sys.version_info))), file=args.output)
     print("# hic source :: {hic} ".format(hic=os.path.abspath(args.hic)), file=args.output)
@@ -179,7 +196,13 @@ if __name__ == "__main__":
     print("# chromosome 2 :: {f2}".format(f2=chr2), file=args.output)
     print("# chromosome {chr1} fragment cnt :: {f1_cnt}".format(f1_cnt=len(fragments1), chr1=chr1), file=args.output)
     print("# chromosome {chr2} fragment cnt :: {f2_cnt}".format(f2_cnt=len(fragments2), chr2=chr2), file=args.output)
-    for key1 in sorted(contacts.keys()):
-        for key2 in sorted(contacts[key1].keys()):
-            print(key1, key2, contacts[key1][key2], sep="\t", file=args.output)
+    for key1 in sorted(contacts_values.keys()):
+        for key2 in sorted(contacts_values[key1].keys()):
+            if args.contact == "value":
+                print(key1, key2, contacts_values[key1][key2], sep="\t", file=args.output)
+            elif args.contact == "matrix":
+                rows = []
+                for row in contacts_matrices[key1][key2]:
+                    rows.append("\t".join(map(str, row)))
+                print(key1, key2, len(rows), "\t".join(rows), sep="\t", file=args.output)
     logger.info("All done. It only took us: {time_cnt}".format(time_cnt=str(datetime.datetime.now() - start_time)))
